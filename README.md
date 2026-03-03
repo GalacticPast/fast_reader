@@ -8,7 +8,7 @@
 * **Raylib:** Used for rendering (included in `external/`).
 
 ##  Setup & Usage
-1. **Clone:** `git clone https://github.com/yourusername/fast_reader.git`
+1. **Clone:** `git clone https://github.com/GalacticPast/fast_reader.git`
 2. **Build:**
 * **Linux:** `./build.sh`
 * **Windows:** `./build.bat`
