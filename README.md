@@ -19,9 +19,10 @@
 ---
 
 ##  Controls
+* **Space:** Pause the text 
 * **Ctrl-V:** Paste the text
-* **K Key:** Increase speed by 50 WPM
 * **J Key:** Decrease speed by 50 WPM
+* **K Key:** Increase speed by 50 WPM
 
 ---
 

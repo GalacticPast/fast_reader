@@ -25,6 +25,7 @@ typedef enum state
 
 typedef struct global_state
 {
+    bool       pause;
     game_state state;
     gui_elem   text_box;
     gui_elem   start_box;
@@ -47,10 +48,12 @@ void display_line(const char *line, Font archivo, Vector2 pos, int font_size, in
 
 int main(void)
 {
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Calculation Connect Five");
 
     global_state gm_state = {};
 
+    gm_state.pause  = false;
     gm_state.text   = NULL;
     gm_state.state  = STATE_MENU;
     gm_state.ind    = 0;
@@ -67,13 +70,13 @@ int main(void)
     float difference     = 0;
     float epsilon        = 0.001;
     float time_for_words = 0;
+    bool  pause          = false;
 
     while (!WindowShouldClose())
     {
         update(&gm_state);
 
         draw(&gm_state);
-
         time_for_words = ((float)60000 / gm_state.wpm) / 1000.0f;
         if (gm_state.state == STATE_READER)
         {
@@ -98,7 +101,12 @@ void update(global_state *gm_state)
         text_box->is_focused = true;
         if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyReleased(KEY_V))
         {
-            gm_state->text = GetClipboardText();
+            const char *clipboard_text = GetClipboardText();
+            if (clipboard_text == NULL)
+            {
+                return;
+            }
+            gm_state->text = clipboard_text;
             int   count    = 0;
             char *ptr      = (char *)gm_state->text;
             while (*ptr != '\0')
@@ -129,52 +137,62 @@ void update(global_state *gm_state)
         {
         case 'K': {
             gm_state->wpm += 50;
-            if(gm_state->wpm > 2000)
+            if (gm_state->wpm > 2000)
             {
                 gm_state->wpm = 2000;
             }
-        }break;
+        }
+        break;
         case 'J': {
             gm_state->wpm -= 50;
-            if(gm_state->wpm < 50)
+            if (gm_state->wpm < 50)
             {
                 gm_state->wpm = 50;
             }
-        } break;
+        }
+        break;
+        case 32: { // space
+            gm_state->pause = gm_state->pause == true ? false : true;
+        }
+        break;
         }
 
-        char *ptr = (char *)gm_state->text;
-        int   ind = gm_state->ind;
+        if (gm_state->pause == false)
+        {
 
-        if (ind >= gm_state->text_length)
-        {
-            printf("finished reading\n");
-            gm_state->state  = STATE_MENU;
-            gm_state->ind    = 0;
-            gm_state->string = NULL;
-            return;
-        }
+            char *ptr = (char *)gm_state->text;
+            int   ind = gm_state->ind;
 
-        ptr += ind;
-        if (*ptr == '\0')
-        {
-            *ptr++ = ' ';
-            ind++;
-        }
-        gm_state->string = ptr;
+            if (ind >= gm_state->text_length)
+            {
+                printf("finished reading\n");
+                gm_state->state  = STATE_MENU;
+                gm_state->ind    = 0;
+                gm_state->string = NULL;
+                return;
+            }
 
-        while (*ptr != ' ' && *ptr != '\n' && *ptr != '\0')
-        {
-            ptr++;
-            ind++;
+            ptr += ind;
+            if (*ptr == '\0')
+            {
+                *ptr++ = ' ';
+                ind++;
+            }
+            gm_state->string = ptr;
+
+            while (*ptr != ' ' && *ptr != '\n' && *ptr != '\0')
+            {
+                ptr++;
+                ind++;
+            }
+            if ((ptr - gm_state->text) != ind)
+            {
+                printf("There is an error.\n");
+                DEBUG_BREAK;
+            }
+            *ptr          = '\0';
+            gm_state->ind = ind;
         }
-        if ((ptr - gm_state->text) != ind)
-        {
-            printf("There is an error.\n");
-            DEBUG_BREAK;
-        }
-        *ptr          = '\0';
-        gm_state->ind = ind;
     }
 }
 
@@ -226,7 +244,7 @@ void draw(global_state *gm_state)
             char   *ptr = (char *)text;
             Vector2 text_size;
 
-            while(*ptr == ' ')
+            while (*ptr == ' ')
             {
                 ptr++;
             }
@@ -295,7 +313,7 @@ void draw(global_state *gm_state)
                        SCREEN_HEIGHT - 10,
                    },
                    5, GRAY);
-        
+
         char wpm[5] = {};
         sprintf(wpm, "%d\n", gm_state->wpm);
         DrawText(wpm, SCREEN_WIDTH - 30, SCREEN_HEIGHT - 20, 15, WHITE);
