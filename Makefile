@@ -3,8 +3,8 @@ ifeq ($(OS),Windows_NT)
 	SRC       := src
 	BIN       := bin
 	CC        := clang
-	ASSEMBLY  := fast_reader 
-	EXTENSION := .exe
+	ASSEMBLY  := fast_reader
+	EXTENSION :=.exe
 
 	DIR := $(subst /,\,${CURDIR})
 	INCLUDES     := -I./external/raylib/include 
