@@ -49,7 +49,7 @@ void display_line(const char *line, Font archivo, Vector2 pos, int font_size, in
 int main(void)
 {
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Calculation Connect Five");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Fast Reader");
 
     global_state gm_state = {};
 
